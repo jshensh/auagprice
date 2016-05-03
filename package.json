@@ -1,0 +1,12 @@
+{
+  "name": "getAuAgPriceList",
+  "version": "0.0.1",
+  "description": "get AU & AG price list",
+  "dependencies": {
+    "http": "*",
+    "socket.io": "*",
+    "socket.io-client": "*",
+    "express": "*",
+    "request": "*"
+  }
+}

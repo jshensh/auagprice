@@ -23,7 +23,7 @@ var main=function() {
             }
             var nServerArr=JSON.parse(nbody.substr(12,nbody.length-13));
             var nServer=nServerArr[Math.floor(Math.random() * nServerArr.length + 1) - 1];
-            console.log("nServerArr: "+nServer);
+            console.log("nServer: "+nServer);
             Nsocket=Pio.connect(nServer, {'force new connection': true, 'reconnection': false});
             nSocketConnect();
         });
@@ -99,12 +99,7 @@ var nSocketConnect=function() {
 };
 
 app.get('/', function(req, res){
-    request('http://www.jin10.com/example/jin10.com.html', function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            res.header("Access-Control-Allow-Origin", "*");
-            res.send(body.replace(/\n|\s{3,}/g,""));
-        }
-    });
+    res.send("感谢金十数据 (jin10.com) 提供数据接口");
 });
 
 io.on('connection', function(socket) {

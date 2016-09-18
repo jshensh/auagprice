@@ -37,6 +37,7 @@ var pSocketConnect=function() {
         Psocket.emit('reqvote', "ok");
     });
     Psocket.on('price list', function(msg) {
+        console.log(msg);
         his[msg['name']]=msg;
         io.emit('price list', msg);
     });
@@ -67,6 +68,7 @@ var nSocketConnect=function() {
         Nsocket.emit('reg', "ok");
     });
     Nsocket.on('user message', function(msg) {
+        console.log(msg);
         io.emit('user message', msg);
         console.log(msg);
     });

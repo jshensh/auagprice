@@ -3,6 +3,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var Pio=require("socket.io-client");
 var request = require('request');
+var Psocket,Nsocket;
 
 var main=function() {
     request('http://jin10.com/js/pserver.js', function (error, response, body) {
@@ -13,7 +14,7 @@ var main=function() {
         var pServerArr=JSON.parse(body.substr(13,body.length-14));
         var pServer=pServerArr[Math.floor(Math.random() * pServerArr.length + 1) - 1];
         console.log("PServer: "+pServer);
-        var Psocket=Pio.connect(pServer, {'force new connection': true, 'reconnection': false});
+        Psocket=Pio.connect(pServer, {'force new connection': true, 'reconnection': false});
         pSocketConnect();
         request('http://cdn.jin10.com/js/action.js', function (error, response, body) {
             if (error || response.statusCode != 200) {
@@ -23,7 +24,7 @@ var main=function() {
             var nServerArr=JSON.parse(body.substr(12,body.length-13));
             var nServer=nServerArr[Math.floor(Math.random() * nServerArr.length + 1) - 1];
             console.log("nServerArr: "+nServer);
-            var Nsocket=Pio.connect(nServer, {'force new connection': true, 'reconnection': false});
+            Nsocket=Pio.connect(nServer, {'force new connection': true, 'reconnection': false});
             nSocketConnect();
         });
     });

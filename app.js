@@ -11,7 +11,9 @@ var main=function() {
             return false;
         }
         var pServerArr=JSON.parse(body.substr(13,body.length-14));
-        var Psocket=Pio.connect(pServerArr[Math.floor(Math.random() * pServerArr.length + 1) - 1], {'force new connection': true, 'reconnection': false});
+        var pServer=pServerArr[Math.floor(Math.random() * pServerArr.length + 1) - 1];
+        console.log("PServer: "+pServer);
+        var Psocket=Pio.connect(pServer, {'force new connection': true, 'reconnection': false});
         pSocketConnect();
         request('http://cdn.jin10.com/js/action.js', function (error, response, body) {
             if (error || response.statusCode != 200) {
@@ -19,7 +21,9 @@ var main=function() {
                 return false;
             }
             var nServerArr=JSON.parse(body.substr(12,body.length-13));
-            var Nsocket=Pio.connect(nServerArr[Math.floor(Math.random() * nServerArr.length + 1) - 1], {'force new connection': true, 'reconnection': false});
+            var nServer=nServerArr[Math.floor(Math.random() * nServerArr.length + 1) - 1];
+            console.log("nServerArr: "+nServer);
+            var Nsocket=Pio.connect(nServer, {'force new connection': true, 'reconnection': false});
             nSocketConnect();
         });
     });

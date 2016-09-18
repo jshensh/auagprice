@@ -73,7 +73,6 @@ var nSocketConnect=function() {
         Nsocket.emit('reg', "ok");
     });
     Nsocket.on('user message', function(msg) {
-        console.log(msg);
         io.emit('user message', msg);
         console.log(msg);
     });
@@ -112,6 +111,14 @@ io.on('connection', function(socket) {
     for (var i in his) {
         io.emit('price list', his[i]);
     }
+    request('http://m.jin10.com/flash?maxId=0&count=50', function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            body=JSON.parse(body);
+            for (var i = body.length - 1; i >= 0; i--) {
+                io.emit('user message', body[i]);
+            };
+        }
+    });
 });
 
 main();

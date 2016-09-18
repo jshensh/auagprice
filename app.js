@@ -2,24 +2,98 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var Pio=require("socket.io-client");
-var Nsocket=Pio.connect("http://121.199.58.43:8081");
-var Psocket=Pio.connect("http://121.199.41.71:8085");
 var request = require('request');
+
+var main=function() {
+    request('http://jin10.com/js/pserver.js', function (error, response, body) {
+        if (error || response.statusCode != 200) {
+            console.log("Get PServer Failed.")
+            return false;
+        }
+        var pServerArr=JSON.parse(body.substr(13,body.length-14));
+        var Psocket=Pio.connect(pServerArr[Math.floor(Math.random() * pServerArr.length + 1) - 1], {'force new connection': true, 'reconnection': false});
+        pSocketConnect();
+        request('http://cdn.jin10.com/js/action.js', function (error, response, body) {
+            if (error || response.statusCode != 200) {
+                console.log("Get NServer Failed.")
+                return false;
+            }
+            var nServerArr=JSON.parse(body.substr(12,body.length-13));
+            var Nsocket=Pio.connect(nServerArr[Math.floor(Math.random() * nServerArr.length + 1) - 1], {'force new connection': true, 'reconnection': false});
+            nSocketConnect();
+        });
+    });
+};
+
+
+
 
 var his = {};
 
-Psocket.on('connect' , function() {
-    Psocket.emit('delAllSubscription' , []);
-    Psocket.emit('addSubscription' , ['XAUUSD' , 'XAGUSD' , 'UKOIL' , 'USOIL' , 'DXY' , 'EURUSD' , 'GC' , 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCHF', 'EURGBP', 'EURJPY', 'XPDUSD' , 'DOWI' ,'NASX' ,'SPX500' ,'JPN225' ,'SZZZ' ,'SZCZ' ,'XPTUSD']);
-    Psocket.emit('reqvote', "ok");
-});
-Nsocket.on('connect' , function() {
-    Nsocket.emit('reg', "ok");
-});
+var pSocketConnect=function() {
+    Psocket.on('connect' , function() {
+        Psocket.emit('delAllSubscription' , []);
+        Psocket.emit('addSubscription' , ['XAUUSD', 'XAGUSD', 'UKOIL', 'USOIL', 'DXY', 'EURUSD', 'GC', 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCHF', 'NZDUSD', 'USDCNH', 'XPDUSD', 'DOWI', 'NASX', 'SPX500', 'JPN225', 'SZZZ', 'SZCZ', 'XPTUSD']);
+        Psocket.emit('reqvote', "ok");
+    });
+    Psocket.on('price list', function(msg) {
+        his[msg['name']]=msg;
+        io.emit('price list', msg);
+    });
+    Psocket.on('error', function (reason) {
+        setTimeout(function () {
+            main();
+        }, 1000)
+    });
+    Psocket.on('connect_error', function (reason) {
+        setTimeout(function () {
+            main();
+        }, 1000)
+    });
+    Psocket.on('repair', function (reason) {
+        setTimeout(function () {
+            main();
+        }, 4000)
+    });
+    Psocket.on('disconnect', function () {
+        setTimeout(function () {
+            main();
+        }, 1000)
+    });
+};
 
+var nSocketConnect=function() {
+    Nsocket.on('connect' , function() {
+        Nsocket.emit('reg', "ok");
+    });
+    Nsocket.on('user message', function(msg) {
+        io.emit('user message', msg);
+        console.log(msg);
+    });
+    Nsocket.on('error', function (reason) {
+        setTimeout(function () {
+            main();
+        }, 1000)
+    });
+    Nsocket.on('connect_error', function (reason) {
+        setTimeout(function () {
+            main();
+        }, 1000)
+    });
+    Nsocket.on('repair', function (reason) {
+        setTimeout(function () {
+            main();
+        }, 4000)
+    });
+    Nsocket.on('disconnect', function () {
+        setTimeout(function () {
+            main();
+        }, 1000)
+    });
+};
 
 app.get('/', function(req, res){
-    request('http://www.jin10.com/jin10.com.html', function (error, response, body) {
+    request('http://www.jin10.com/example/jin10.com.html', function (error, response, body) {
         if (!error && response.statusCode == 200) {
             res.header("Access-Control-Allow-Origin", "*");
             res.send(body.replace(/\n|\s{3,}/g,""));
@@ -31,16 +105,6 @@ io.on('connection', function(socket) {
     for (var i in his) {
         io.emit('price list', his[i]);
     }
-});
-Psocket.on('price list', function(msg) {
-    his[msg['name']]=msg;
-    io.emit('price list', msg);
-    console.log(msg);
-});
-
-Nsocket.on('user message', function(msg) {
-    io.emit('user message', msg);
-    console.log(msg);
 });
 
 http.listen(3000, function(){

@@ -6,22 +6,22 @@ var request = require('request');
 var Psocket,Nsocket;
 
 var main=function() {
-    request('http://jin10.com/js/pserver.js', function (error, response, body) {
+    request('http://jin10.com/js/pserver.js', function (error, response, pbody) {
         if (error || response.statusCode != 200) {
             console.log("Get PServer Failed.")
             return false;
         }
-        var pServerArr=JSON.parse(body.substr(13,body.length-14));
+        var pServerArr=JSON.parse(pbody.substr(13,pbody.length-14));
         var pServer=pServerArr[Math.floor(Math.random() * pServerArr.length + 1) - 1];
         console.log("PServer: "+pServer);
         Psocket=Pio.connect(pServer, {'force new connection': true, 'reconnection': false});
         pSocketConnect();
-        request('http://cdn.jin10.com/js/action.js', function (error, response, body) {
+        request('http://jin10.com/js/server.js', function (error, response, nbody) {
             if (error || response.statusCode != 200) {
                 console.log("Get NServer Failed.")
                 return false;
             }
-            var nServerArr=JSON.parse(body.substr(12,body.length-13));
+            var nServerArr=JSON.parse(nbody.substr(12,nbody.length-13));
             var nServer=nServerArr[Math.floor(Math.random() * nServerArr.length + 1) - 1];
             console.log("nServerArr: "+nServer);
             Nsocket=Pio.connect(nServer, {'force new connection': true, 'reconnection': false});
